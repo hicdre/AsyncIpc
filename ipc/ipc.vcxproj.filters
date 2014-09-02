@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ipc">
+      <UniqueIdentifier>{e70582e1-e6af-4bde-9881-706dd6704a4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="exclude">
+      <UniqueIdentifier>{6ef07ef7-e2b1-48c9-addb-c74b51c479f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="build">
+      <UniqueIdentifier>{1535d84c-3a6e-47e7-ac29-be88e042a049}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ipc_channel_handle.h">
+      <Filter>ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="ipc_utils.h">
+      <Filter>ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="ipc_sender.h">
+      <Filter>ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="ipc_common.h">
+      <Filter>ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="ipc_platform_file.h">
+      <Filter>ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="ipc_thread.h">
+      <Filter>ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="ipc_channel.h">
+      <Filter>ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="ipc_channel_win.h">
+      <Filter>ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="ipc_listener.h">
+      <Filter>ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="ipc_message.h">
+      <Filter>ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="ipc_channel_reader.h">
+      <Filter>ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="ipc_logging.h">
+      <Filter>exclude</Filter>
+    </ClInclude>
+    <ClInclude Include="ipc_sync_channel.h">
+      <Filter>exclude</Filter>
+    </ClInclude>
+    <ClInclude Include="ipc_message_utils.h">
+      <Filter>exclude</Filter>
+    </ClInclude>
+    <ClInclude Include="ipc_message_utils_impl.h">
+      <Filter>exclude</Filter>
+    </ClInclude>
+    <ClInclude Include="ipc_forwarding_message_filter.h">
+      <Filter>exclude</Filter>
+    </ClInclude>
+    <ClInclude Include="ipc_channel_proxy.h">
+      <Filter>exclude</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>build</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ipc_utils.cpp">
+      <Filter>ipc</Filter>
+    </ClCompile>
+    <ClCompile Include="ipc_platform_file.cpp">
+      <Filter>ipc</Filter>
+    </ClCompile>
+    <ClCompile Include="ipc_thread.cpp">
+      <Filter>ipc</Filter>
+    </ClCompile>
+    <ClCompile Include="ipc_channel.cpp">
+      <Filter>ipc</Filter>
+    </ClCompile>
+    <ClCompile Include="ipc_message.cpp">
+      <Filter>ipc</Filter>
+    </ClCompile>
+    <ClCompile Include="ipc_channel_reader.cpp">
+      <Filter>ipc</Filter>
+    </ClCompile>
+    <ClCompile Include="ipc_channel_win.cpp">
+      <Filter>ipc</Filter>
+    </ClCompile>
+    <ClCompile Include="ipc_logging.cc">
+      <Filter>exclude</Filter>
+    </ClCompile>
+    <ClCompile Include="ipc_sync_channel.cc">
+      <Filter>exclude</Filter>
+    </ClCompile>
+    <ClCompile Include="ipc_message_utils.cc">
+      <Filter>exclude</Filter>
+    </ClCompile>
+    <ClCompile Include="ipc_forwarding_message_filter.cc">
+      <Filter>exclude</Filter>
+    </ClCompile>
+    <ClCompile Include="ipc_channel_proxy.cc">
+      <Filter>exclude</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>build</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -23,7 +23,7 @@ class MessageReader
 {
 public:
 	MessageReader() : read_ptr_(NULL), read_end_ptr_(NULL) {}
-	explicit MessageReader(const Message& m);
+	explicit MessageReader(Message* m);
 
 	// Methods for reading the payload of the Pickle. To read from the start of
 	// the Pickle, create a PickleIterator from a Pickle. If successful, these
@@ -77,7 +77,7 @@ class Message {
     HAS_SENT_TIME_BIT = 0x80,
   };
 
-  virtual ~Message();
+  
 
   Message();
 
@@ -89,6 +89,9 @@ class Message {
   // instead the data is merely referenced by this message.  Only const methods
   // should be used on the message when initialized this way.
   Message(const char* data, int data_len);
+
+  void AddRef() const;
+  void Release() const;
 
   // Returns the size of the Pickle's data.
   size_t size() const { return kHeaderSize + header_->payload_size; }
@@ -213,34 +216,6 @@ class Message {
   // known size. See also WriteData.
   bool WriteBytes(const void* data, int data_len);
 
-  template<class T, class S>
-  static bool Dispatch(const Message* msg, T* obj, S* sender,
-                       void (T::*func)()) {
-    (obj->*func)();
-    return true;
-  }
-
-  template<class T, class S>
-  static bool Dispatch(const Message* msg, T* obj, S* sender,
-                       void (T::*func)() const) {
-    (obj->*func)();
-    return true;
-  }
-
-  template<class T, class S>
-  static bool Dispatch(const Message* msg, T* obj, S* sender,
-                       void (T::*func)(const Message&)) {
-    (obj->*func)(*msg);
-    return true;
-  }
-
-  template<class T, class S>
-  static bool Dispatch(const Message* msg, T* obj, S* sender,
-                       void (T::*func)(const Message&) const) {
-    (obj->*func)(*msg);
-    return true;
-  }
-
   // Used for async messages with no parameters.
   static void Log(std::string* name, const Message* msg, std::string* l) {
   }
@@ -281,7 +256,7 @@ class Message {
 
  protected:
   friend class Channel;
-  friend class SyncMessage;
+  virtual ~Message();
 
 #pragma pack(push, 4)
   struct Header {
@@ -321,6 +296,8 @@ class Message {
   // Allocation size of payload (or -1 if allocation is const).
   size_t capacity_;
   size_t variable_buffer_offset_;  // IF non-zero, then offset to a buffer.
+
+  mutable LONG ref_count_;
 };
 
 //------------------------------------------------------------------------------

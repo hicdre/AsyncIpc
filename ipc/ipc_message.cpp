@@ -44,6 +44,7 @@ Message::~Message() {
 Message::Message()
 	: header_(NULL)
 	, capacity_(0)
+	, ref_count_(0)
 	, variable_buffer_offset_(0) {
 	Resize(kPayloadUnit);
 	
@@ -59,6 +60,7 @@ Message::Message()
 Message::Message(int32 routing_id, uint32 type, PriorityValue priority)
 	: header_(NULL)
 	, capacity_(0)
+	, ref_count_(0)
 	, variable_buffer_offset_(0) {
 	Resize(kPayloadUnit);
 
@@ -75,6 +77,7 @@ Message::Message(int32 routing_id, uint32 type, PriorityValue priority)
 Message::Message(const char* data, int data_len) 
 	: header_(reinterpret_cast<Header*>(const_cast<char*>(data)))
 	, capacity_(kCapacityReadOnly)
+	, ref_count_(0)
 	, variable_buffer_offset_(0) {
 
 	if (kHeaderSize > static_cast<unsigned int>(data_len))
@@ -201,10 +204,23 @@ bool Message::WriteBytes(const void* data, int data_len)
 	return true;
 }
 
+void Message::AddRef() const
+{
+	InterlockedIncrement(&ref_count_);
+}
 
-MessageReader::MessageReader(const Message& m)
-	: read_ptr_(m.payload())
-	, read_end_ptr_(m.end_of_payload())
+void Message::Release() const
+{
+	if (InterlockedDecrement(&ref_count_) == 0)
+	{
+		delete this;
+	}
+}
+
+
+MessageReader::MessageReader(Message* m)
+	: read_ptr_(m->payload())
+	, read_end_ptr_(m->end_of_payload())
 {
 
 }

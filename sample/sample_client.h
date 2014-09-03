@@ -15,7 +15,7 @@ public:
 	{
 		sender_ = sender;
 	}
-	virtual bool OnMessageReceived(const IPC::Message& msg)
+	virtual bool OnMessageReceived(IPC::Message* msg)
 	{
 		std::cout << "Listener::OnChannelConnected(): Message Received" << std::endl;
 		return true;

@@ -44,7 +44,7 @@ class ChannelReader {
 
   // Returns true if the given message is the "hello" message sent on channel
   // set-up.
-  bool IsHelloMessage(const Message& m) const;
+  bool IsHelloMessage(Message* m) const;
 
  protected:
   enum ReadState { READ_SUCCEEDED, READ_FAILED, READ_PENDING };
@@ -77,7 +77,7 @@ class ChannelReader {
   virtual bool DidEmptyInputBuffers() = 0;
 
   // Handles the first message sent over the pipe which contains setup info.
-  virtual void HandleHelloMessage(const Message& msg) = 0;
+  virtual void HandleHelloMessage(Message* msg) = 0;
 
  private:
   // Takes the given data received from the IPC channel and dispatches any

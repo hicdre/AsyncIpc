@@ -38,9 +38,9 @@ bool ChannelReader::AsyncReadComplete(int bytes_read) {
   return DispatchInputData(input_buf_, bytes_read);
 }
 
-bool ChannelReader::IsHelloMessage(const Message& m) const {
-  return m.routing_id() == MSG_ROUTING_NONE &&
-         m.type() == Channel::HELLO_MESSAGE_TYPE;
+bool ChannelReader::IsHelloMessage(Message* m) const {
+  return m->routing_id() == MSG_ROUTING_NONE &&
+         m->type() == Channel::HELLO_MESSAGE_TYPE;
 }
 
 bool ChannelReader::DispatchInputData(const char* input_data,
@@ -69,8 +69,9 @@ bool ChannelReader::DispatchInputData(const char* input_data,
     const char* message_tail = Message::FindNext(p, end);
     if (message_tail) {
       int len = static_cast<int>(message_tail - p);
-      Message m(p, len);
-      if (!WillDispatchInputMessage(&m))
+      Message* m = new Message(p, len);
+	  m->AddRef();
+      if (!WillDispatchInputMessage(m))
         return false;
 
 #ifdef IPC_MESSAGE_LOG_ENABLED

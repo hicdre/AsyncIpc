@@ -66,7 +66,7 @@ void Channel::ChannelImpl::Close() {
   while (!output_queue_.empty()) {
     Message* m = output_queue_.front();
     output_queue_.pop();
-    delete m;
+	m->Release();
   }
 }
 
@@ -138,11 +138,11 @@ Channel::ChannelImpl::ReadState Channel::ChannelImpl::ReadData(
 bool Channel::ChannelImpl::WillDispatchInputMessage(Message* msg) {
   // Make sure we get a hello when client validation is required.
   if (validate_client_)
-    return IsHelloMessage(*msg);
+    return IsHelloMessage(msg);
   return true;
 }
 
-void Channel::ChannelImpl::HandleHelloMessage(const Message& msg) {
+void Channel::ChannelImpl::HandleHelloMessage(Message* msg) {
   // The hello message contains one parameter containing the PID.
 	MessageReader it(msg);
 	int32 claimed_pid;
@@ -261,7 +261,7 @@ bool Channel::ChannelImpl::CreatePipe(const IPC::ChannelHandle &channel_handle,
   Message* m = new Message(MSG_ROUTING_NONE,
                                     HELLO_MESSAGE_TYPE,
                                     IPC::Message::PRIORITY_NORMAL);
-
+  m->AddRef();
   // Don't send the secret to the untrusted process, and don't send a secret
   // if the value is zero (for IPC backwards compatability).
   int32 secret = validate_client_ ? 0 : client_secret_;
@@ -269,7 +269,7 @@ bool Channel::ChannelImpl::CreatePipe(const IPC::ChannelHandle &channel_handle,
       (secret && !m->WriteUInt32(secret))) {
     CloseHandle(pipe_);
     pipe_ = INVALID_HANDLE_VALUE;
-	delete m;
+	m->Release();
     return false;
   }
 
@@ -365,7 +365,7 @@ bool Channel::ChannelImpl::ProcessOutgoingMessages(
 	assert(!output_queue_.empty());
     Message* m = output_queue_.front();
     output_queue_.pop();
-    delete m;
+	m->Release();
   }
 
   if (output_queue_.empty())

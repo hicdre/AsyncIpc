@@ -16,7 +16,7 @@ class Listener {
  public:
   // Called when a message is received.  Returns true iff the message was
   // handled.
-  virtual bool OnMessageReceived(const Message& message) = 0;
+  virtual bool OnMessageReceived(Message* message) = 0;
 
   // Called when the channel is connected and we have received the internal
   // Hello message from the peer.

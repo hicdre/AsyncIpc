@@ -169,7 +169,7 @@ class ChannelProxy : public Sender {
     virtual ~Context();
 
     // IPC::Listener methods:
-    virtual bool OnMessageReceived(const Message& message) override;
+    virtual bool OnMessageReceived(Message* message) override;
 	virtual void OnChannelConnected(int32 peer_pid) override;
 	virtual void OnChannelError() override;
 

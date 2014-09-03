@@ -36,28 +36,6 @@ class Thread;
 
 class Channel : public Sender {
  public:
-  // Flags to test modes
-  enum ModeFlags {
-    MODE_NO_FLAG = 0x0,
-    MODE_SERVER_FLAG = 0x1,
-    MODE_CLIENT_FLAG = 0x2,
-    MODE_NAMED_FLAG = 0x4,
-  };
-
-  // Some Standard Modes
-  enum Mode {
-    MODE_NONE = MODE_NO_FLAG,
-    MODE_SERVER = MODE_SERVER_FLAG,
-    MODE_CLIENT = MODE_CLIENT_FLAG,
-    // Channels on Windows are named by default and accessible from other
-    // processes. On POSIX channels are anonymous by default and not accessible
-    // from other processes. Named channels work via named unix domain sockets.
-    // On Windows MODE_NAMED_SERVER is equivalent to MODE_SERVER and
-    // MODE_NAMED_CLIENT is equivalent to MODE_CLIENT.
-    MODE_NAMED_SERVER = MODE_SERVER_FLAG | MODE_NAMED_FLAG,
-    MODE_NAMED_CLIENT = MODE_CLIENT_FLAG | MODE_NAMED_FLAG,
-  };
-
   // The Hello message is internal to the Channel class.  It is sent
   // by the peer when the channel is connected.  The message contains
   // just the process id (pid).  The message has a special routing_id
@@ -89,7 +67,7 @@ class Channel : public Sender {
   // |listener| receives a callback on the current thread for each newly
   // received message.
   //
-  Channel(const IPC::ChannelHandle &channel_handle, Mode mode,
+  Channel(const IPC::ChannelHandle &channel_handle,
 	  Listener* listener, Thread* runner);
 
   virtual ~Channel();

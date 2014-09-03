@@ -64,6 +64,7 @@ namespace IPC
 
 		void Run();
 		bool DoScheduledWork();
+		void ScheduleWork();
 		void WaitForWork();
 
 		bool MatchCompletedIOItem(IOHandler* filter, IOItem* item);

@@ -24,18 +24,18 @@ Channel::ChannelImpl::State::~State() {
 }
 
 Channel::ChannelImpl::ChannelImpl(const IPC::ChannelHandle &channel_handle,
-	Mode mode, Listener* listener, Thread* thread)
+	Listener* listener, Thread* thread)
     : ChannelReader(listener),
       input_state_(this),
       output_state_(this),
       pipe_(INVALID_HANDLE_VALUE),
       peer_pid_(0),
-      waiting_connect_(mode & MODE_SERVER_FLAG),
+      waiting_connect_(true),
       processing_incoming_(false),
       client_secret_(0),
 	  thread_(thread),
       validate_client_(false) {
-  CreatePipe(channel_handle, mode);
+  CreatePipe(channel_handle);
 }
 
 Channel::ChannelImpl::~ChannelImpl() {
@@ -191,8 +191,7 @@ const std::wstring Channel::ChannelImpl::PipeName(
   return ASCIIToWide(name.append(channel_id));
 }
 
-bool Channel::ChannelImpl::CreatePipe(const IPC::ChannelHandle &channel_handle,
-                                      Mode mode) {
+bool Channel::ChannelImpl::CreatePipe(const IPC::ChannelHandle &channel_handle) {
   assert(INVALID_HANDLE_VALUE == pipe_);
   std::wstring pipe_name;
   // If we already have a valid pipe for channel just copy it.
@@ -205,11 +204,6 @@ bool Channel::ChannelImpl::CreatePipe(const IPC::ChannelHandle &channel_handle,
     DWORD flags = 0;
     GetNamedPipeInfo(channel_handle.pipe.handle, &flags, NULL, NULL, NULL);
     assert(!(flags & PIPE_TYPE_MESSAGE));
-    if (((mode & MODE_SERVER_FLAG) && !(flags & PIPE_SERVER_END)) ||
-        ((mode & MODE_CLIENT_FLAG) && (flags & PIPE_SERVER_END))) {
-      //LOG(WARNING) << "Inconsistent open mode. Mode :" << mode;
-      return false;
-    }
     if (!DuplicateHandle(GetCurrentProcess(),
                          channel_handle.pipe.handle,
                          GetCurrentProcess(),
@@ -220,11 +214,13 @@ bool Channel::ChannelImpl::CreatePipe(const IPC::ChannelHandle &channel_handle,
       //LOG(WARNING) << "DuplicateHandle failed. Error :" << GetLastError();
       return false;
     }
-  } else if (mode & MODE_SERVER_FLAG) {
+  } else {
 	assert(!channel_handle.pipe.handle);
+	pipe_name = PipeName(channel_handle.name, &client_secret_);
+
+	//ÏÈ³¢ÊÔ´´½¨
     const DWORD open_mode = PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED |
                             FILE_FLAG_FIRST_PIPE_INSTANCE;
-    pipe_name = PipeName(channel_handle.name, &client_secret_);
     validate_client_ = !!client_secret_;
     pipe_ = CreateNamedPipeW(pipe_name.c_str(),
                              open_mode,
@@ -234,20 +230,20 @@ bool Channel::ChannelImpl::CreatePipe(const IPC::ChannelHandle &channel_handle,
                              Channel::kReadBufferSize,
                              5000,
                              NULL);
-  } else if (mode & MODE_CLIENT_FLAG) {
-	assert(!channel_handle.pipe.handle);
-    pipe_name = PipeName(channel_handle.name, &client_secret_);
-    pipe_ = CreateFileW(pipe_name.c_str(),
-                        GENERIC_READ | GENERIC_WRITE,
-                        0,
-                        NULL,
-                        OPEN_EXISTING,
-                        SECURITY_SQOS_PRESENT | SECURITY_IDENTIFICATION |
-                            FILE_FLAG_OVERLAPPED,
-                        NULL);
-  } else {
-	  assert(0);
-  }
+	if (pipe_ == INVALID_HANDLE_VALUE)
+	{
+		pipe_ = CreateFileW(pipe_name.c_str(),
+			GENERIC_READ | GENERIC_WRITE,
+			0,
+			NULL,
+			OPEN_EXISTING,
+			SECURITY_SQOS_PRESENT | SECURITY_IDENTIFICATION |
+			FILE_FLAG_OVERLAPPED,
+			NULL);
+
+		waiting_connect_ = false;
+	}
+  } 
 
   if (pipe_ == INVALID_HANDLE_VALUE) {
     // If this process is being closed, the pipe may be gone already.
@@ -455,9 +451,9 @@ void Channel::ChannelImpl::OnIOCompleted(
 
 //------------------------------------------------------------------------------
 // Channel's methods simply call through to ChannelImpl.
-Channel::Channel(const IPC::ChannelHandle &channel_handle, Mode mode,
+Channel::Channel(const IPC::ChannelHandle &channel_handle, 
 	Listener* listener, Thread* runner)
-	: channel_impl_(new ChannelImpl(channel_handle, mode, listener, runner)) {
+	: channel_impl_(new ChannelImpl(channel_handle, listener, runner)) {
 }
 
 Channel::~Channel() {

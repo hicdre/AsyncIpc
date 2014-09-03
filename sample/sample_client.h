@@ -1,63 +1,91 @@
 #pragma once
 
-#include "ipc/ipc_channel.h"
-#include "ipc/ipc_thread.h"
-#include "ipc/ipc_listener.h"
+#include "ipc/ipc_endpoint.h"
 
 #include "common.h"
 
 #include <iostream>
+#include <thread>
 
 class SampleClient : public IPC::Listener
 {
 public:
 	void Init(IPC::Sender* sender)
 	{
+		
 		sender_ = sender;
 	}
 	virtual bool OnMessageReceived(IPC::Message* msg)
 	{
-		std::cout << "Listener::OnChannelConnected(): Message Received" << std::endl;
+		std::string s;
+		msg->routing_id();
+		IPC::MessageReader reader(msg);
+		reader.ReadString(&s);
+		std::cout << "Process [" << msg->routing_id() <<"]: "<< s << std::endl;
 		return true;
 	}
 
 	virtual void OnChannelConnected(int32 peer_pid)
 	{
-		std::cout << "Listener::OnChannelConnected(): Channel Connected" << std::endl;
-
-		IPC::Message* m = new IPC::Message;
-		m->WriteString("hello, this is client");
-		sender_->Send(m);
+		id_ = peer_pid;
+		std::cout << "Process [" << peer_pid << "] Connected" << std::endl;
 	}
 
 	virtual void OnChannelError()
 	{
-		std::cout << "Listener::OnChannelConnected(): Channel Error" << std::endl;
-		exit(0);
+		std::cout << "Process [" << id_ << "] Disconnected" << std::endl;
 	}
 protected:
+	int32 id_;
 	IPC::Sender* sender_{ NULL };
 };
 
 int ClientMain()
 {
-	IPC::Thread ipc_thread;
-	SampleClient clientListener;
-
-	std::cout << "Client: Creating IPC channel " << kChannelName << std::endl;
-	IPC::Channel clientChannel(kChannelName, IPC::Channel::MODE_CLIENT, &clientListener, &ipc_thread);
-	clientListener.Init(&clientChannel);
-
-	if (!clientChannel.Connect()){
-		std::cout << "Client: Error in connecting to the channel " << kChannelName << std::endl;
-		return 1;
+	SampleClient listener;
+	IPC::Endpoint* endpoint = NULL;
+	std::string cmd;
+	while (true)
+	{
+		std::cout << ">>";
+		std::cin >> cmd;
+		if (cmd == "exit")
+		{
+			break;
+		}
+		else if (cmd == "connect")
+		{
+			endpoint = new IPC::Endpoint(kChannelName, &listener);
+		}
+		else if (cmd == "close")
+		{
+			if (endpoint)
+			{
+				delete endpoint;
+				endpoint = NULL;
+			}
+		}
+		else
+		{
+			if (endpoint == NULL)
+			{
+				std::cout << "Connect First!" << std::endl;
+			}
+			else
+			{
+				IPC::Message* m = new IPC::Message(GetCurrentProcessId(), 0, (IPC::Message::PriorityValue)0);
+				m->WriteString(cmd);
+				std::cout << "Process [" << GetCurrentProcessId() << "]: " << cmd << std::endl;
+				endpoint->Send(m);
+			}
+		}
 	}
-	std::cout << "Client: Connected to IPC channel " << kChannelName << std::endl;
 
-	std::cout << "Initializing listener" << std::endl;
-
-	ipc_thread.Start();
-	ipc_thread.Wait(INFINITE);
+	if (endpoint)
+	{
+		delete endpoint;
+		endpoint = NULL;
+	}
 
 	return 0;
 }

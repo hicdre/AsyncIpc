@@ -88,6 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ipc_common.h" />
+    <ClInclude Include="ipc_endpoint.h" />
     <ClInclude Include="ipc_thread.h" />
     <ClInclude Include="ipc_channel.h" />
     <ClInclude Include="ipc_channel_handle.h" />
@@ -125,6 +126,7 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ipc_endpoint.cpp" />
     <ClCompile Include="ipc_thread.cpp" />
     <ClCompile Include="ipc_channel.cpp" />
     <ClCompile Include="ipc_channel_proxy.cc">

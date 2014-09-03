@@ -39,7 +39,7 @@ int ServerMain()
 	SampleServer serverListener;
 
 	std::cout << "====Creating Server : " << kChannelName << std::endl;
-	IPC::Channel serverChannel(kChannelName, IPC::Channel::MODE_SERVER, &serverListener, &ipc_thread);
+	IPC::Channel serverChannel(kChannelName, &serverListener, &ipc_thread);
 
 	if (!serverChannel.Connect()){
 		std::cout << "====Creating Server Error!"<< std::endl;

@@ -20,7 +20,7 @@ class Channel::ChannelImpl : public internal::ChannelReader,
                              public Thread::IOHandler {
  public:
   // Mirror methods of Channel, see ipc_channel.h for description.
-  ChannelImpl(const IPC::ChannelHandle &channel_handle, Mode mode,
+  ChannelImpl(const IPC::ChannelHandle &channel_handle,
 	  Listener* listener, Thread* thread);
   ~ChannelImpl();
   bool Connect();
@@ -40,7 +40,7 @@ class Channel::ChannelImpl : public internal::ChannelReader,
 
   static const std::wstring PipeName(const std::string& channel_id,
                                  int32* secret);
-  bool CreatePipe(const IPC::ChannelHandle &channel_handle, Mode mode);
+  bool CreatePipe(const IPC::ChannelHandle &channel_handle);
 
   bool ProcessConnection();
   bool ProcessOutgoingMessages(Thread::IOContext* context,

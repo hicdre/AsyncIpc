@@ -49,6 +49,7 @@ namespace IPC
 			Lock lock(task_mutex_);
 			task_queue_.push_back(task);
 		}
+		ScheduleWork();
 	}
 
 	void Thread::Start()
@@ -214,4 +215,12 @@ namespace IPC
 		}
 		return false;
 	}
+
+	void Thread::ScheduleWork()
+	{
+		PostQueuedCompletionStatus(io_port_, 0,
+			reinterpret_cast<ULONG_PTR>(this),
+			reinterpret_cast<OVERLAPPED*>(this));
+	}
+
 }

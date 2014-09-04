@@ -79,9 +79,7 @@ namespace IPC
 		HANDLE io_port_;
 		std::list<IOItem> completed_io_;
 
-		Mutex task_mutex_;
+		Lock task_mutex_;
 		std::deque<Task> task_queue_;
-
-
 	};
 }

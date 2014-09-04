@@ -2,17 +2,17 @@
 #include <cassert>
 #include <stdlib.h>
 
-Mutex::Mutex()
+Lock::Lock()
 {
 	::InitializeCriticalSectionAndSpinCount(&cs, 2000);
 }
 
-Mutex::~Mutex()
+Lock::~Lock()
 {
 	::DeleteCriticalSection(&cs);
 }
 
-bool Mutex::Try()
+bool Lock::Try()
 {
 	if (::TryEnterCriticalSection(&cs) != FALSE) {
 		return true;
@@ -20,23 +20,23 @@ bool Mutex::Try()
 	return false;
 }
 
-void Mutex::Lock()
+void Lock::Dolock()
 {
 	::EnterCriticalSection(&cs);
 }
 
-void Mutex::Unlock()
+void Lock::Unlock()
 {
 	::LeaveCriticalSection(&cs);
 }
 
-Lock::Lock(Mutex& m)
+AutoLock::AutoLock(Lock& m)
 	: m_(m)
 {
-	m_.Lock();
+	m_.Dolock();
 }
 
-Lock::~Lock()
+AutoLock::~AutoLock()
 {
 	m_.Unlock();
 }

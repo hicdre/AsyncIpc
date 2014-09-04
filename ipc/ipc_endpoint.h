@@ -13,6 +13,8 @@ namespace IPC
 
 		void Start();
 
+		bool IsConnected() const;
+
 		virtual bool Send(Message* message) override;
 
 		virtual bool OnMessageReceived(Message* message) override;
@@ -23,11 +25,17 @@ namespace IPC
 
 	private:
 		void CreateChannel();
+		void OnSendMessage(scoped_refptr<Message> message);
 		void CloseChannel(HANDLE wait_event);
+		void SetConnected(bool c);
 		std::string name_;
 		Thread thread_;
 
 		Channel* channel_;
 		Listener* listener_;
+		//std::queue
+
+		mutable Lock lock_;
+		bool is_connected_;
 	};
 }

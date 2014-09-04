@@ -1,16 +1,16 @@
 #pragma once
 #include "ipc/ipc_common.h"
 
-class Mutex
+class Lock
 {
 public:
-	Mutex();
-	~Mutex();
+	Lock();
+	~Lock();
 
 	bool Try();
 
 	// Take the lock, blocking until it is available if necessary.
-	void Lock();
+	void Dolock();
 
 	// Release the lock.  This must only be called by the lock's holder: after
 	// a successful call to Try, or a call to Lock.
@@ -18,18 +18,18 @@ public:
 
 private:
 	CRITICAL_SECTION cs;
-	DISALLOW_COPY_AND_ASSIGN(Mutex);
+	DISALLOW_COPY_AND_ASSIGN(Lock);
 };
 
-class Lock
+class AutoLock
 {
 public:
-	explicit Lock(Mutex& m);
-	~Lock();
+	explicit AutoLock(Lock& m);
+	~AutoLock();
 
 private:
-	Mutex& m_;
-	DISALLOW_COPY_AND_ASSIGN(Lock);
+	Lock& m_;
+	DISALLOW_COPY_AND_ASSIGN(AutoLock);
 };
 
 class StaticAtomicSequenceNumber {
@@ -47,6 +47,43 @@ private:
 	}
 
 	int32 seq_;
+};
+
+template <class T>
+class scoped_refptr
+{
+public:
+	scoped_refptr(T* t)
+	{
+		p_ = t;
+		if (p_)
+			p_->AddRef();
+	}
+	~scoped_refptr()
+	{
+		Clear();
+	}
+	scoped_refptr(const scoped_refptr<T>& r) : p_(r.p_) {
+		if (p_)
+			p_->AddRef();
+	}
+	void Clear()
+	{
+		if (p_)
+			p_->Release();
+	}
+	T* operator->() const
+	{
+		return p_;
+	}
+	T* get() const
+	{
+		return p_;
+	}
+
+
+private:
+	T* p_;
 };
 
 int RandInt(int min, int max);

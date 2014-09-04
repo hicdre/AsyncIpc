@@ -7,7 +7,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ipc", "ipc\ipc.vcxproj", "{
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sample_client", "sample\sample_client.vcxproj", "{ADD3A329-4FB0-4B04-8C47-98DBFE5A06D4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sample_server", "sample\sample_server.vcxproj", "{F15D047E-1369-432E-91C0-03E932370D55}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ipc_dll", "ipc_dll\ipc_dll.vcxproj", "{A808021A-C2FF-4B8D-A24A-B3535BCA0637}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sample_dll_client", "sample\sample_dll_client.vcxproj", "{F15D047E-1369-432E-91C0-03E932370D55}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +25,10 @@ Global
 		{ADD3A329-4FB0-4B04-8C47-98DBFE5A06D4}.Debug|Win32.Build.0 = Debug|Win32
 		{ADD3A329-4FB0-4B04-8C47-98DBFE5A06D4}.Release|Win32.ActiveCfg = Release|Win32
 		{ADD3A329-4FB0-4B04-8C47-98DBFE5A06D4}.Release|Win32.Build.0 = Release|Win32
+		{A808021A-C2FF-4B8D-A24A-B3535BCA0637}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A808021A-C2FF-4B8D-A24A-B3535BCA0637}.Debug|Win32.Build.0 = Debug|Win32
+		{A808021A-C2FF-4B8D-A24A-B3535BCA0637}.Release|Win32.ActiveCfg = Release|Win32
+		{A808021A-C2FF-4B8D-A24A-B3535BCA0637}.Release|Win32.Build.0 = Release|Win32
 		{F15D047E-1369-432E-91C0-03E932370D55}.Debug|Win32.ActiveCfg = Debug|Win32
 		{F15D047E-1369-432E-91C0-03E932370D55}.Debug|Win32.Build.0 = Debug|Win32
 		{F15D047E-1369-432E-91C0-03E932370D55}.Release|Win32.ActiveCfg = Release|Win32

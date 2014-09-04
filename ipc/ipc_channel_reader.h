@@ -5,8 +5,8 @@
 #ifndef IPC_IPC_CHANNEL_READER_H_
 #define IPC_IPC_CHANNEL_READER_H_
 
+#include "ipc/ipc_listener.h"
 #include "ipc/ipc_common.h"
-#include "ipc/ipc_channel.h"
 
 namespace IPC {
 namespace internal {
@@ -25,6 +25,9 @@ namespace internal {
 // here (and rename appropriately) rather than writing a different class.
 class ChannelReader {
  public:
+	 // Amount of data to read at once from the pipe.
+	 static const size_t kReadBufferSize = 4 * 1024;
+
   explicit ChannelReader(Listener* listener);
   virtual ~ChannelReader();
 
@@ -90,7 +93,7 @@ class ChannelReader {
 
   // We read from the pipe into this buffer. Managed by DispatchInputData, do
   // not access directly outside that function.
-  char input_buf_[Channel::kReadBufferSize];
+  char input_buf_[kReadBufferSize];
 
   // Large messages that span multiple pipe buffers, get built-up using
   // this buffer.

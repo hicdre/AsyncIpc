@@ -46,7 +46,7 @@ namespace IPC
 	void Thread::PostTask(const Task& task)
 	{
 		{
-			Lock lock(task_mutex_);
+			AutoLock lock(task_mutex_);
 			task_queue_.push_back(task);
 		}
 		ScheduleWork();
@@ -116,7 +116,7 @@ namespace IPC
 	{
 		std::deque<Task> work_queue;
 		{
-			Lock lock(task_mutex_);
+			AutoLock lock(task_mutex_);
 			if (task_queue_.empty())
 				return false;
 			work_queue.swap(task_queue_);

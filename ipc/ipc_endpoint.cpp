@@ -1,4 +1,5 @@
 #include "ipc_endpoint.h"
+#include "ipc/ipc_message.h"
 #include <cassert>
 
 namespace IPC
@@ -7,6 +8,7 @@ namespace IPC
 	Endpoint::Endpoint(const std::string& name, Listener* listener, bool start_now)
 		: name_(name)
 		, listener_(listener)
+		, is_connected_(false)
 	{
 		thread_.Start();
 		if (start_now)
@@ -15,6 +17,7 @@ namespace IPC
 
 	Endpoint::~Endpoint()
 	{
+		SetConnected(false);
 		if (channel_) 
 		{
 			HANDLE wait_event = ::CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -35,6 +38,21 @@ namespace IPC
 			thread_.PostTask(std::bind(&Endpoint::CreateChannel, this));
 	}
 
+
+	bool Endpoint::IsConnected() const
+	{
+		AutoLock lock(lock_);
+		return is_connected_;
+	}
+
+
+	void Endpoint::SetConnected(bool c)
+	{
+		AutoLock lock(lock_);
+		is_connected_ = c;
+	}
+
+
 	void Endpoint::CreateChannel()
 	{
 		if (channel_)
@@ -46,10 +64,23 @@ namespace IPC
 
 	bool Endpoint::Send(Message* message)
 	{
-		if (channel_ == NULL)
+		scoped_refptr<Message> m(message);
+		if (channel_ == NULL || !IsConnected()) {
 			return false;
-		return channel_->Send(message);
+		}
+		thread_.PostTask(std::bind(&Endpoint::OnSendMessage, this, m));
+		return true;
 	}
+
+
+	void Endpoint::OnSendMessage(scoped_refptr<Message> message)
+	{
+		if (channel_ == NULL)
+			return;
+
+		channel_->Send(message.get());
+	}
+
 
 	bool Endpoint::OnMessageReceived(Message* message)
 	{
@@ -58,15 +89,17 @@ namespace IPC
 
 	void Endpoint::OnChannelConnected(int32 peer_pid)
 	{
+		SetConnected(true);
 		listener_->OnChannelConnected(peer_pid);
 	}
 
 	void Endpoint::OnChannelError()
 	{
-		listener_->OnChannelError();
 		Channel* ch = channel_;
 		channel_ = NULL;
 		delete ch;
+		SetConnected(false);
+		listener_->OnChannelError();
 		Start();
 	}
 

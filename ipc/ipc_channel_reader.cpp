@@ -5,6 +5,8 @@
 #include "ipc/ipc_channel_reader.h"
 
 #include "ipc/ipc_listener.h"
+#include "ipc/ipc_message.h"
+#include "ipc/ipc_channel.h"
 //#include "ipc/ipc_logging.h"
 #include <cassert>
 
@@ -21,7 +23,7 @@ ChannelReader::~ChannelReader() {
 bool ChannelReader::ProcessIncomingMessages() {
   while (true) {
     int bytes_read = 0;
-    ReadState read_state = ReadData(input_buf_, Channel::kReadBufferSize,
+    ReadState read_state = ReadData(input_buf_, kReadBufferSize,
                                     &bytes_read);
     if (read_state == READ_FAILED)
       return false;

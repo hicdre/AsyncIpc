@@ -17,7 +17,6 @@ namespace IPC {
 
 //------------------------------------------------------------------------------
 
-struct LogData;
 class Message;
 class MessageReader
 {
@@ -76,8 +75,6 @@ class Message {
     PUMPING_MSGS_BIT  = 0x40,
     HAS_SENT_TIME_BIT = 0x80,
   };
-
-  
 
   Message();
 

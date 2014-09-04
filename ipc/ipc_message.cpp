@@ -39,6 +39,8 @@ namespace IPC {
 //------------------------------------------------------------------------------
 
 Message::~Message() {
+	if (capacity_ != kCapacityReadOnly)
+		free(header_);
 }
 
 Message::Message()
